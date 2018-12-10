@@ -15,7 +15,8 @@ import java.util.stream.Stream;
 public class PoliceReportService {
     public List<PoliceReport> readPolizeiBerichteFromFile() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(readFile(), new TypeReference<List<PoliceReport>>() {
+        String input = readFile();
+        return objectMapper.readValue(input, new TypeReference<List<PoliceReport>>() {
         });
     }
 

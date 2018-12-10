@@ -24,12 +24,22 @@ public class Application implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("Start deleting");
-        policeReportRepository.deleteAll();
-        System.out.println("Finished deleting");
-        List<PoliceReport> policeReports = policeReportService.readPolizeiBerichteFromFile();
-        System.out.println("Start saving");
-        List<PoliceReport> policeReportsSaved = policeReportRepository.saveAll(policeReports);
-        System.out.println("Finished saving");
+//        System.out.println("Start deleting");
+//        policeReportRepository.deleteAll();
+//        System.out.println("Finished deleting");
+//        List<PoliceReport> policeReports = policeReportService.readPolizeiBerichteFromFile();
+//        System.out.println("Start saving");
+//        List<PoliceReport> policeReportsSaved = policeReportRepository.saveAll(policeReports);
+//        System.out.println("Finished saving");
+
+        long start = System.nanoTime();
+        List<PoliceReport> all = policeReportRepository.findAll();
+        long finish = System.nanoTime();
+
+        System.out.println("run-" + "time: " + (finish - start) / 1000.);
+        System.out.println("size: " + all.size());
+
+        List<PoliceReport> byHeader = policeReportRepository.getByIsLocationInHeader(true);
+        System.out.println();
     }
 }

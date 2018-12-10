@@ -43,8 +43,8 @@ public class PoliceReportTransformer {
     }
 
     private PoliceReportTransformed transform(PoliceReport policeReport) {
-        List<String> contentTokenized = tokenize(policeReport.Content);
-        List<String> titleTokenized = tokenize(policeReport.Title);
+        List<String> contentTokenized = tokenize(policeReport.content);
+        List<String> titleTokenized = tokenize(policeReport.title);
         return new PoliceReportTransformed(policeReport, contentTokenized, titleTokenized);
     }
 

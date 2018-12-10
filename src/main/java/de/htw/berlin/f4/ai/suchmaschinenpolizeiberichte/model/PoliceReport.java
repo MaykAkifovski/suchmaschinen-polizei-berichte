@@ -8,25 +8,52 @@ public class PoliceReport {
     @Id
     public String id;
 
-    public String Header;
-    public Boolean IsLocationInHeader;
-    public String Title;
-    public String URL;
-    public String CreatedAt;
-    public String Content;
+    public String header;
+    public Boolean isLocationInHeader;
+    public String title;
+    public String url;
+    public String createdAt;
+    public String content;
 
     public PoliceReport() {
-
     }
 
-    public PoliceReport(String id, String header, Boolean isLocationInHeader, String title, String URL, String createdAt, String content) {
+    public PoliceReport(String id, String header, Boolean isLocationInHeader, String title, String url, String createdAt, String content) {
         this.id = id;
-        Header = header;
-        IsLocationInHeader = isLocationInHeader;
-        Title = title;
-        this.URL = URL;
-        CreatedAt = createdAt;
-        Content = content;
+        this.header = header;
+        this.isLocationInHeader = isLocationInHeader;
+        this.title = title;
+        this.url = url;
+        this.createdAt = createdAt;
+        this.content = content;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getHeader() {
+        return header;
+    }
+
+    public Boolean getLocationInHeader() {
+        return isLocationInHeader;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public String getContent() {
+        return content;
     }
 
     public void setId(String id) {
@@ -34,26 +61,26 @@ public class PoliceReport {
     }
 
     public void setHeader(String header) {
-        Header = header;
+        this.header = header;
     }
 
     public void setLocationInHeader(Boolean locationInHeader) {
-        IsLocationInHeader = locationInHeader;
+        isLocationInHeader = locationInHeader;
     }
 
     public void setTitle(String title) {
-        Title = title;
+        this.title = title;
     }
 
-    public void setURL(String URL) {
-        this.URL = URL;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public void setCreatedAt(String createdAt) {
-        CreatedAt = createdAt;
+        this.createdAt = createdAt;
     }
 
     public void setContent(String content) {
-        Content = content;
+        this.content = content;
     }
 }
