@@ -5,15 +5,19 @@ import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.PoliceReportTransf
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportRepository;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportTransformedRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.springframework.util.StringUtils.isEmpty;
+
+@Component
 public class PoliceReportTransformer {
 
     @Autowired
@@ -23,17 +27,18 @@ public class PoliceReportTransformer {
 
     private List<String> filter;
 
-    private void run() throws IOException {
+    public void run() throws IOException {
         filter = initFilter();
 
-        List<PoliceReport> alleBerichte = policeReportRepository.findAll();
+        List<PoliceReport> policeReports = policeReportRepository.getByIsLocationInHeader(true);
 
-        List<PoliceReportTransformed> tokanizierteBerichte = alleBerichte
+        List<PoliceReportTransformed> tokanizierteBerichte = policeReports
                 .stream()
                 .map(this::transform)
                 .collect(Collectors.toList());
 
-        policeReportTransformedRepository.saveAll(tokanizierteBerichte);
+//        policeReportTransformedRepository.saveAll(tokanizierteBerichte);
+        System.out.println();
     }
 
     private List<String> initFilter() throws IOException {
@@ -43,34 +48,27 @@ public class PoliceReportTransformer {
     }
 
     private PoliceReportTransformed transform(PoliceReport policeReport) {
-        List<String> contentTokenized = tokenize(policeReport.content);
-        List<String> titleTokenized = tokenize(policeReport.title);
-        return new PoliceReportTransformed(policeReport, contentTokenized, titleTokenized);
+        PoliceReportTransformed policeReportTransformed = new PoliceReportTransformed();
+        policeReportTransformed.setIdToOrigin(policeReport.id);
+        policeReportTransformed.setContent(tokenize(policeReport.content));
+        extractDateLocation(policeReport.header, policeReportTransformed);
+        return policeReportTransformed;
+    }
+
+    private void extractDateLocation(String header, PoliceReportTransformed policeReportTransformed) {
+        String[] s = header.split(" ");
+        System.out.println();
+
     }
 
     private List<String> tokenize(String toSplit) {
-        return edit(toSplit.split(" "));
-    }
-
-    private List<String> edit(String[] splited) {
-        List<String> edited = new ArrayList<>();
-        edited.add(splited[0]);
-        for (int i = 1; i < splited.length - 1; i++) {
-            if (splited[i].equals("von")) {
-                edited.add(splited[i - 1] + splited[i] + splited[i + 1]);
-                i++;
-            } else {
-                edited.add(splited[i]);
-            }
-        }
-        edited.add(splited[splited.length - 1]);
-        return filter(edited);
-    }
-
-    private List<String> filter(List<String> edited) {
-        return edited.stream()
-                .filter(word -> !filter.contains(word))
+        return Arrays.stream(toSplit.split(" "))
+                .map(this::transformWord)
+                .filter(word -> !filter.contains(word) || !isEmpty(word))
                 .collect(Collectors.toList());
     }
 
+    private String transformWord(String word) {
+        return word.toLowerCase().replaceAll("([,.!?]$)", "");
+    }
 }

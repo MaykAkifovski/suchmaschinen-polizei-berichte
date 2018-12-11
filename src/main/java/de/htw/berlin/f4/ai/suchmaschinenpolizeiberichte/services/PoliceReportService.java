@@ -13,6 +13,19 @@ import java.util.stream.Stream;
 
 @Component
 public class PoliceReportService {
+
+
+//    @Autowired
+//    private PoliceReportService policeReportService;
+
+//        System.out.println("Start deleting");
+//        policeReportRepository.deleteAll();
+//        System.out.println("Finished deleting");
+//        List<PoliceReport> policeReports = policeReportService.readPolizeiBerichteFromFile();
+//        System.out.println("Start saving");
+//        List<PoliceReport> policeReportsSaved = policeReportRepository.saveAll(policeReports);
+//        System.out.println("Finished saving");
+
     public List<PoliceReport> readPolizeiBerichteFromFile() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         String input = readFile();

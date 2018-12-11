@@ -27,6 +27,8 @@ repositories {
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-data-mongodb:2.1.0.RELEASE")
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
+    compile group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
+
 
     implementation('org.springframework.boot:spring-boot-starter')
 

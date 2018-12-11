@@ -1,45 +1,25 @@
 package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte;
 
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.PoliceReport;
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportRepository;
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.services.PoliceReportService;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.services.PoliceReportTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.List;
+import java.io.IOException;
 
 @SpringBootApplication
 public class Application implements CommandLineRunner {
 
     @Autowired
-    private PoliceReportRepository policeReportRepository;
-    @Autowired
-    private PoliceReportService policeReportService;
+    private PoliceReportTransformer policeReportTransformer;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
 
     @Override
-    public void run(String... args) throws Exception {
-//        System.out.println("Start deleting");
-//        policeReportRepository.deleteAll();
-//        System.out.println("Finished deleting");
-//        List<PoliceReport> policeReports = policeReportService.readPolizeiBerichteFromFile();
-//        System.out.println("Start saving");
-//        List<PoliceReport> policeReportsSaved = policeReportRepository.saveAll(policeReports);
-//        System.out.println("Finished saving");
-
-        long start = System.nanoTime();
-        List<PoliceReport> all = policeReportRepository.findAll();
-        long finish = System.nanoTime();
-
-        System.out.println("run-" + "time: " + (finish - start) / 1000.);
-        System.out.println("size: " + all.size());
-
-        List<PoliceReport> byHeader = policeReportRepository.getByIsLocationInHeader(true);
-        System.out.println();
+    public void run(String... args) throws IOException {
+        policeReportTransformer.run();
     }
 }
