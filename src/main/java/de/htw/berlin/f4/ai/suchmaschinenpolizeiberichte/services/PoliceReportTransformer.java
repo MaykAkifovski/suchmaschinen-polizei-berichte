@@ -42,7 +42,7 @@ public class PoliceReportTransformer {
     }
 
     private List<String> initFilter() throws IOException {
-        try (Stream<String> stream = Files.lines(Paths.get("D:\\HTWBerlin\\Semester5\\SuchMaschinen\\suchmaschinen-polizei-berichte\\src\\main\\resources\\stopwords.txt"))) {
+        try (Stream<String> stream = Files.lines(Paths.get("/home/leoroi/hdd/0/ses/suchmaschinen-polizei-berichte/src/main/resources/stopwords.txt"))) {
             return stream.collect(Collectors.toList());
         }
     }
@@ -55,6 +55,16 @@ public class PoliceReportTransformer {
         return policeReportTransformed;
     }
 
+    /**
+     * pol_df["Location"] = pol_df["Header"].str.extract(
+     *    r"""(Mitte|Friedrichshain *- *Kreuzberg|Pankow|Charlottenburg* - *Wilmersdorf|Spandau|Steglitz* - *Zehlendorf|Tempelhof* - *Schöneberg|Neukölln|Treptow* - *Köpenick|Marzahn* - *Hellersdorf|Lichtenberg|Reinickendorf|bezirksübergreifend|berlinweit|bundesweit)""")
+     * pol_df.loc[pol_df["Location"].isnull(),"Location"] = pol_df[pol_df["Location"].isnull()]["Content"].str.extract(
+     *    r"""(Mitte|Friedrichshain *- *Kreuzberg|Pankow|Charlottenburg* - *Wilmersdorf|Spandau|Steglitz* - *Zehlendorf|Tempelhof* - *Schöneberg|Neukölln|Treptow* - *Köpenick|Marzahn* - *Hellersdorf|Lichtenberg|Reinickendorf|bezirksübergreifend|[bB]erlinweit|Berlin/Brandenburg|Berlin/Köln|Berlin/Bayern|Berlin/Niedersachsen/Niederlande|bundesweit)""", expand=False)
+     * pol_df["Location"] = pol_df["Location"].str.replace(" ","")
+     *
+     * @param header
+     * @param policeReportTransformed
+     */
     private void extractDateLocation(String header, PoliceReportTransformed policeReportTransformed) {
         String[] s = header.split(" ");
         System.out.println();
