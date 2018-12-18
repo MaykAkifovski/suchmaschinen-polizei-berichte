@@ -7,14 +7,11 @@ import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportT
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,11 +27,9 @@ public class PoliceReportTransformer {
     private PoliceReportTransformedRepository policeReportTransformedRepository;
 
     private List<String> filter;
-    private HashMap<String, String> lexikon;
 
     public void run() throws IOException {
         filter = initFilter();
-        initLexikon();
 
         List<PoliceReport> policeReports = policeReportRepository.getByIsLocationInHeader(true);
 
@@ -50,26 +45,6 @@ public class PoliceReportTransformer {
     private List<String> initFilter() throws IOException {
         try (Stream<String> stream = Files.lines(Paths.get("D:\\HTWBerlin\\Semester5\\SuchMaschinen\\suchmaschinen-polizei-berichte\\src\\main\\resources\\stopwords.txt"))) {
             return stream.collect(Collectors.toList());
-        }
-    }
-
-    private void initLexikon() throws IOException {
-        lexikon = new HashMap<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("D:\\HTWBerlin\\Semester5\\SuchMaschinen\\suchmaschinen-polizei-berichte\\src\\main\\resources\\delexicon.txt"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                // process the line.
-                String[] s = line.split("\t");
-                String key = s[0].toLowerCase();
-                String[] values = s[4].split(".");
-                String value;
-                if (values.length == 0) {
-                    value = s[4].toLowerCase();
-                } else {
-                    value = values[values.length - 1].toLowerCase();
-                }
-                lexikon.put(key, value);
-            }
         }
     }
 
@@ -106,7 +81,7 @@ public class PoliceReportTransformer {
         return Arrays.stream(toSplit.split(" "))
                 .map(this::transformWord)
                 .filter(this::toFilter)
-                .map(word -> lexikon.getOrDefault(word, word))
+//                .map(word -> lexicon.getOrDefault(word, word))
                 .collect(Collectors.toList());
     }
 
@@ -124,6 +99,15 @@ public class PoliceReportTransformer {
     }
 
     private String transformWord(String word) {
-        return word.toLowerCase().replaceAll("([,.!?]$)", "");
+        return word
+                .toLowerCase()
+                .replaceAll("([,.!?]$)", "")
+                .replaceAll("ß", "ss")
+                .replaceAll("[Ää]", "a")
+                .replaceAll("[Öö]", "o")
+                .replaceAll("[Üü]", "u")
+                .replaceAll("ae", "ae")
+                .replaceAll("oe", "ae")
+                .replaceAll("ue", "ae");
     }
 }
