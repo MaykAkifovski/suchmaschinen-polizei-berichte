@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -71,23 +72,29 @@ public class PoliceReportTransformer {
      */
     public void extractDateLocation(String header, PoliceReportTransformed policeReportTransformed) {
         String[] headerStrings = header.split(" ");
-        List<String> locations = Collections.emptyList();
+        List<String> locations = Arrays.asList("Mitte", "Friedrichshain", "Kreuzberg", "Pankow", "Charlottenburg", "Wilmersdorf", "Spandau", "Steglitz", "Zehlendorf", "Tempelhof", "Schöneberg", "Neukölln", "Treptow", "Köpenick", "Marzahn", "Hellersdorf", "Lichtenberg", "Reinickendorf", "bezirksübergreifend", "berlinweit", "bundesweit");
+        List<String> locationsFound = new ArrayList<>();
 
-        for(String s : headerStrings) {
-            if(s.length() > 4 && Character.isDigit(s.charAt(0))) {
+        for(String headerElement : headerStrings) {
+            System.out.println(headerElement);
+            if(headerElement.length() > 4 && Character.isDigit(headerElement.charAt(0))) {
                 long date = 0;
                 try {
-                    date = new SimpleDateFormat("dd.MM.yyyy").parse(s).getTime();
+                    date = new SimpleDateFormat("dd.MM.yyyy").parse(headerElement).getTime();
                 } catch (ParseException pe) {
                     pe.printStackTrace();
                 }
                 policeReportTransformed.setDate(date);
             }
 
+            System.out.println(locations.contains(headerElement));
+            if(locations.contains(headerElement)) {
+                System.out.println("aaaaaaaaaaaaaa");
+                locationsFound.add(headerElement);
+                System.out.println(locationsFound);
+                policeReportTransformed.setLocation(locationsFound);
+            }
         }
-
-        //not implemented
-        policeReportTransformed.setLocation(locations);
     }
 
     private List<String> tokenize(String toSplit) {
