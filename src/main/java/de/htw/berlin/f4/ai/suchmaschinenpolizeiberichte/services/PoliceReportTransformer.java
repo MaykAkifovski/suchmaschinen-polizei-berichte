@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -67,14 +69,25 @@ public class PoliceReportTransformer {
      * @param header
      * @param policeReportTransformed
      */
-    private void extractDateLocation(String header, PoliceReportTransformed policeReportTransformed) {
-        String[] s = header.split(" ");
-        System.out.println();
+    public void extractDateLocation(String header, PoliceReportTransformed policeReportTransformed) {
+        String[] headerStrings = header.split(" ");
+        List<String> locations = Collections.emptyList();
 
-        List<String> location = Collections.emptyList();
-        policeReportTransformed.setLocation(location);
-        long date = 0;
-        policeReportTransformed.setDate(date);
+        for(String s : headerStrings) {
+            if(s.length() > 4 && Character.isDigit(s.charAt(0))) {
+                long date = 0;
+                try {
+                    date = new SimpleDateFormat("dd.MM.yyyy").parse(s).getTime();
+                } catch (ParseException pe) {
+                    pe.printStackTrace();
+                }
+                policeReportTransformed.setDate(date);
+            }
+
+        }
+
+        //not implemented
+        policeReportTransformed.setLocation(locations);
     }
 
     private List<String> tokenize(String toSplit) {
