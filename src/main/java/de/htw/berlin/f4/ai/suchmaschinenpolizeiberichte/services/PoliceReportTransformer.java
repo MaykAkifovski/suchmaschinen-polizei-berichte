@@ -12,10 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -53,9 +50,11 @@ public class PoliceReportTransformer {
 
     private PoliceReportTransformed transform(PoliceReport policeReport) {
         PoliceReportTransformed policeReportTransformed = new PoliceReportTransformed();
+
         policeReportTransformed.setIdToOrigin(policeReport.id);
         policeReportTransformed.setContent(tokenize(policeReport.content));
         policeReportTransformed.setTitle(tokenize(policeReport.title));
+
         extractDateLocation(policeReport.header, policeReportTransformed);
         return policeReportTransformed;
     }
@@ -72,12 +71,14 @@ public class PoliceReportTransformer {
      */
     public void extractDateLocation(String header, PoliceReportTransformed policeReportTransformed) {
         String[] headerStrings = header.split(" ");
-        List<String> locations = Arrays.asList("Mitte", "Friedrichshain", "Kreuzberg", "Pankow", "Charlottenburg", "Wilmersdorf", "Spandau", "Steglitz", "Zehlendorf", "Tempelhof", "Schöneberg", "Neukölln", "Treptow", "Köpenick", "Marzahn", "Hellersdorf", "Lichtenberg", "Reinickendorf", "bezirksübergreifend", "berlinweit", "bundesweit");
+        Set<String> locations = new HashSet<>(Arrays.asList("Mitte", "Friedrichshain", "Kreuzberg", "Pankow", "Charlottenburg", "Wilmersdorf", "Spandau", "Steglitz", "Zehlendorf", "Tempelhof", "Schöneberg", "Neukölln", "Treptow", "Köpenick", "Marzahn", "Hellersdorf", "Lichtenberg", "Reinickendorf", "bezirksübergreifend", "berlinweit", "bundesweit"));
         List<String> locationsFound = new ArrayList<>();
 
         for(String headerElement : headerStrings) {
-            System.out.println(headerElement);
-            if(headerElement.length() > 4 && Character.isDigit(headerElement.charAt(0))) {
+            System.out.println("PoliceReportTransformer.extractDateLocation.headerElement: " + headerElement);
+
+            if(Character.isDigit(headerElement.charAt(0)) && headerElement.length() > 7) {
+                System.out.println("PoliceReportTransformer.extractDateLocation: date if");
                 long date = 0;
                 try {
                     date = new SimpleDateFormat("dd.MM.yyyy").parse(headerElement).getTime();
@@ -85,16 +86,12 @@ public class PoliceReportTransformer {
                     pe.printStackTrace();
                 }
                 policeReportTransformed.setDate(date);
-            }
-
-            System.out.println(locations.contains(headerElement));
-            if(locations.contains(headerElement)) {
-                System.out.println("aaaaaaaaaaaaaa");
+            } else if(locations.contains(headerElement)) {
+                System.out.println("PoliceReportTransformer.extractDateLocation: location if");
                 locationsFound.add(headerElement);
-                System.out.println(locationsFound);
-                policeReportTransformed.setLocation(locationsFound);
             }
         }
+        policeReportTransformed.setLocation(locationsFound);
     }
 
     private List<String> tokenize(String toSplit) {
