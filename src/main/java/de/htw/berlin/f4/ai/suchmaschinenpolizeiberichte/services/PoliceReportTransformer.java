@@ -65,20 +65,14 @@ public class PoliceReportTransformer {
      * pol_df.loc[pol_df["Location"].isnull(),"Location"] = pol_df[pol_df["Location"].isnull()]["Content"].str.extract(
      * r"""(Mitte|Friedrichshain *- *Kreuzberg|Pankow|Charlottenburg* - *Wilmersdorf|Spandau|Steglitz* - *Zehlendorf|Tempelhof* - *Schöneberg|Neukölln|Treptow* - *Köpenick|Marzahn* - *Hellersdorf|Lichtenberg|Reinickendorf|bezirksübergreifend|[bB]erlinweit|Berlin/Brandenburg|Berlin/Köln|Berlin/Bayern|Berlin/Niedersachsen/Niederlande|bundesweit)""", expand=False)
      * pol_df["Location"] = pol_df["Location"].str.replace(" ","")
-     *
-     * @param header
-     * @param policeReportTransformed
      */
     public void extractDateLocation(String header, PoliceReportTransformed policeReportTransformed) {
-        String[] headerStrings = header.split(" ");
+        String[] headerStrings = header.replaceAll("[\n\r]", " ").split(" ");
         Set<String> locations = new HashSet<>(Arrays.asList("Mitte", "Friedrichshain", "Kreuzberg", "Pankow", "Charlottenburg", "Wilmersdorf", "Spandau", "Steglitz", "Zehlendorf", "Tempelhof", "Schöneberg", "Neukölln", "Treptow", "Köpenick", "Marzahn", "Hellersdorf", "Lichtenberg", "Reinickendorf", "bezirksübergreifend", "berlinweit", "bundesweit"));
         List<String> locationsFound = new ArrayList<>();
 
         for(String headerElement : headerStrings) {
-            System.out.println("PoliceReportTransformer.extractDateLocation.headerElement: " + headerElement);
-
             if(Character.isDigit(headerElement.charAt(0)) && headerElement.length() > 7) {
-                System.out.println("PoliceReportTransformer.extractDateLocation: date if");
                 long date = 0;
                 try {
                     date = new SimpleDateFormat("dd.MM.yyyy").parse(headerElement).getTime();
@@ -87,7 +81,6 @@ public class PoliceReportTransformer {
                 }
                 policeReportTransformed.setDate(date);
             } else if(locations.contains(headerElement)) {
-                System.out.println("PoliceReportTransformer.extractDateLocation: location if");
                 locationsFound.add(headerElement);
             }
         }
