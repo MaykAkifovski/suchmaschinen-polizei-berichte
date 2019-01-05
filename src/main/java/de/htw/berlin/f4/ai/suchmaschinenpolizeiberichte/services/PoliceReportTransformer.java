@@ -25,19 +25,29 @@ public class PoliceReportTransformer {
     private PoliceReportRepository policeReportRepository;
     @Autowired
     private PoliceReportTransformedRepository policeReportTransformedRepository;
+    @Autowired
+    private GermanWordNormalizerService germanWordNormalizerService;
 
-    private List<String> filter;
+    private List<String> filter = new ArrayList<>();
+    private List<PoliceReport> policeReports = new ArrayList<>();
 
-    public void run() throws IOException {
-        filter = initFilter();
+    public void run(Integer start, Integer stop) throws IOException {
+        if (filter.isEmpty())
+            filter = initFilter();
 
-        List<PoliceReport> policeReports = policeReportRepository.getByIsLocationInHeader(true);
+        if (policeReports.isEmpty())
+            policeReports = policeReportRepository.getByIsLocationInHeader(true);
 
-        List<PoliceReportTransformed> tokanizierteBerichte = policeReports
-                .stream()
-                .map(this::transform)
-                .collect(Collectors.toList());
-
+        for (int i = start; i < stop; i++) {
+            PoliceReport policeReport = policeReports.get(i);
+            PoliceReportTransformed policeReportTransformed = transform(policeReport);
+//            policeReportTransformedRepository.save(policeReportTransformed);
+        }
+//        List<PoliceReportTransformed> tokanizierteBerichte = policeReports
+//                .stream()
+//                .map(this::transform)
+//                .collect(Collectors.toList());
+//
 //        policeReportTransformedRepository.saveAll(tokanizierteBerichte);
         System.out.println();
     }
@@ -59,20 +69,13 @@ public class PoliceReportTransformer {
         return policeReportTransformed;
     }
 
-    /**
-     * pol_df["Location"] = pol_df["Header"].str.extract(
-     * r"""(Mitte|Friedrichshain *- *Kreuzberg|Pankow|Charlottenburg* - *Wilmersdorf|Spandau|Steglitz* - *Zehlendorf|Tempelhof* - *Schöneberg|Neukölln|Treptow* - *Köpenick|Marzahn* - *Hellersdorf|Lichtenberg|Reinickendorf|bezirksübergreifend|berlinweit|bundesweit)""")
-     * pol_df.loc[pol_df["Location"].isnull(),"Location"] = pol_df[pol_df["Location"].isnull()]["Content"].str.extract(
-     * r"""(Mitte|Friedrichshain *- *Kreuzberg|Pankow|Charlottenburg* - *Wilmersdorf|Spandau|Steglitz* - *Zehlendorf|Tempelhof* - *Schöneberg|Neukölln|Treptow* - *Köpenick|Marzahn* - *Hellersdorf|Lichtenberg|Reinickendorf|bezirksübergreifend|[bB]erlinweit|Berlin/Brandenburg|Berlin/Köln|Berlin/Bayern|Berlin/Niedersachsen/Niederlande|bundesweit)""", expand=False)
-     * pol_df["Location"] = pol_df["Location"].str.replace(" ","")
-     */
-    public void extractDateLocation(String header, PoliceReportTransformed policeReportTransformed) {
+    protected void extractDateLocation(String header, PoliceReportTransformed policeReportTransformed) {
         String[] headerStrings = header.replaceAll("[\n\r]", " ").split(" ");
         Set<String> locations = new HashSet<>(Arrays.asList("Mitte", "Friedrichshain", "Kreuzberg", "Pankow", "Charlottenburg", "Wilmersdorf", "Spandau", "Steglitz", "Zehlendorf", "Tempelhof", "Schöneberg", "Neukölln", "Treptow", "Köpenick", "Marzahn", "Hellersdorf", "Lichtenberg", "Reinickendorf", "bezirksübergreifend", "berlinweit", "bundesweit"));
         List<String> locationsFound = new ArrayList<>();
 
-        for(String headerElement : headerStrings) {
-            if(Character.isDigit(headerElement.charAt(0)) && headerElement.length() > 7) {
+        for (String headerElement : headerStrings) {
+            if (Character.isDigit(headerElement.charAt(0)) && headerElement.length() > 7) {
                 long date = 0;
                 try {
                     date = new SimpleDateFormat("dd.MM.yyyy").parse(headerElement).getTime();
@@ -80,7 +83,7 @@ public class PoliceReportTransformer {
                     pe.printStackTrace();
                 }
                 policeReportTransformed.setDate(date);
-            } else if(locations.contains(headerElement)) {
+            } else if (locations.contains(headerElement)) {
                 locationsFound.add(headerElement);
             }
         }
@@ -89,35 +92,16 @@ public class PoliceReportTransformer {
 
     private List<String> tokenize(String toSplit) {
         return Arrays.stream(toSplit.split(" "))
-                .map(this::transformWord)
                 .filter(this::toFilter)
-//                .map(word -> lexicon.getOrDefault(word, word))
+                .map(this::normalize)
                 .collect(Collectors.toList());
     }
 
     private boolean toFilter(String word) {
-        return !(filter.contains(word) || isEmpty(word) || isNumber(word));
+        return !(filter.contains(word.toLowerCase()) || isEmpty(word));
     }
 
-    private boolean isNumber(String word) {
-        try {
-            Double.parseDouble(word);
-            return true;
-        } catch (Exception ignored) {
-            return false;
-        }
-    }
-
-    private String transformWord(String word) {
-        return word
-                .toLowerCase()
-                .replaceAll("([,.!?]$)", "")
-                .replaceAll("ß", "ss")
-                .replaceAll("[Ää]", "a")
-                .replaceAll("[Öö]", "o")
-                .replaceAll("[Üü]", "u")
-                .replaceAll("ae", "ae")
-                .replaceAll("oe", "ae")
-                .replaceAll("ue", "ae");
+    private String normalize(String word) {
+        return germanWordNormalizerService.normalize(word);
     }
 }
