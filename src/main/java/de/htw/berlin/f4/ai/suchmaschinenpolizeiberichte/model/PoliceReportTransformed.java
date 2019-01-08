@@ -17,7 +17,7 @@ public class PoliceReportTransformed {
     @Id
     private String id;
     private String idToOrigin;
-    private List<String> location;
+    private String location;
     private long date;
     private List<String> title;
     private List<String> content;

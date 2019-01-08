@@ -6,44 +6,55 @@ import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportT
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class PoliceReportsRanker {
 
     @Autowired
-    private PoliceReportTransformedRepository policeReportTransformedRepository;
+    private PoliceReportTransformedRepository repository;
+
+    @Autowired
+    private TextTransformerService textService;
 
     public List<String> getTop10PoliceReports(FrontEndRequest frontEndRequest) {
-
-        List<PoliceReportTransformed> allReports = getAllReports(frontEndRequest);
+        List<String> searchStrings = textService.transform(frontEndRequest.getSearchString());
+        List<PoliceReportTransformed> allReports = getAllReports();
+        Stream<PoliceReportTransformed> filteredReports = filterReports(allReports, frontEndRequest);
         return null;
     }
 
-    private List<PoliceReportTransformed> getAllReports(FrontEndRequest frontEndRequest) {
-        return policeReportTransformedRepository
-                .findAll()
-                .stream()
-                .filter(policeReportTransformed -> filterByLocation(policeReportTransformed.getLocation(), frontEndRequest.getLocation()))
-                .filter(policeReportTransformed -> filterByDate(policeReportTransformed.getDate(), frontEndRequest.getStartDate(), frontEndRequest.getEndDate()))
-                .collect(Collectors.toList());
+    private List<PoliceReportTransformed> getAllReports() {
+        return repository.findAll();
     }
 
-    private boolean filterByLocation(List<String> locationsInReport, List<String> locationsInRequest) {
-        return locationsInRequest
-                .stream()
-                .anyMatch(locationsInReport::contains);
-    }
-
-    private boolean filterByDate(long date, String startDate, String endDate) {
-        //            long sDate = new SimpleDateFormat("dd.MM.yyyy").parse(startDate).getTime();
-//            long eDate = new SimpleDateFormat("dd.MM.yyyy").parse(endDate).getTime();
+    private Stream<PoliceReportTransformed> filterReports(List<PoliceReportTransformed> allReports, FrontEndRequest frontEndRequest) {
         try {
-            return Long.parseLong(startDate) <= date && Long.parseLong(endDate) >= date;
-        } catch (Exception ignored) {
-            return false;
+            long startDate = parseDate(frontEndRequest.getSearchDaterange().get(0));
+            long endDate = parseDate(frontEndRequest.getSearchDaterange().get(1));
+
+            return filterByLocation(allReports, frontEndRequest.getSearchLocations())
+                    .filter(policeReportTransformed -> filterByDate(policeReportTransformed.getDate(), startDate, endDate));
+        } catch (ParseException ignored) {
+            return filterByLocation(allReports, frontEndRequest.getSearchLocations());
         }
     }
 
+    private long parseDate(String date) throws ParseException {
+        String[] ts = date.split("T");
+        return new SimpleDateFormat("yyyy-MM-dd").parse(ts[0]).getTime();
+    }
+
+    private Stream<PoliceReportTransformed> filterByLocation(List<PoliceReportTransformed> allReports, List<String> locationsInRequest) {
+        return allReports
+                .stream()
+                .filter(policeReportTransformed -> locationsInRequest.contains(policeReportTransformed.getLocation()));
+    }
+
+    private boolean filterByDate(long date, long startDate, long endDate) {
+        return startDate <= date && endDate >= date;
+    }
 }

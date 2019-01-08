@@ -10,8 +10,7 @@ import java.util.List;
 @Getter
 @Builder
 public class FrontEndRequest {
-    private List<String> location;
-    private String startDate;
-    private String endDate;
-    private String text;
+    private String searchString;
+    private List<String> searchDaterange;
+    private List<String> searchLocations;
 }
