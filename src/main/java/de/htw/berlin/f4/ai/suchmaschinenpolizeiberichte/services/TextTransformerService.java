@@ -1,5 +1,6 @@
 package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -16,6 +17,9 @@ import static org.springframework.util.StringUtils.isEmpty;
 
 @Component
 public class TextTransformerService {
+
+    @Autowired
+    private GermanWordNormalizerService normalizerService;
 
     private List<String> stopWords = new ArrayList<>();
 
@@ -43,7 +47,6 @@ public class TextTransformerService {
     }
 
     private String normalize(String word) {
-//        return germanWordNormalizerService.normalize(word);
-        return "";
+        return normalizerService.lemmatize(word);
     }
 }

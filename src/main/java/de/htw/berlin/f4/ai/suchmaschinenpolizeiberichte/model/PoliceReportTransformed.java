@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 
 
-@Document(collection = "PoliceReportsTransformed")
+@Document(collection = "PoliceReportsTransformed_2")
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter

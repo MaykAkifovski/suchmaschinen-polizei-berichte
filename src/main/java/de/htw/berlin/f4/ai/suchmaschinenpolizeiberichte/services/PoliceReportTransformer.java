@@ -102,6 +102,6 @@ public class PoliceReportTransformer {
     }
 
     private String normalize(String word) {
-        return germanWordNormalizerService.normalize(word);
+        return germanWordNormalizerService.lemmatize(word);
     }
 }

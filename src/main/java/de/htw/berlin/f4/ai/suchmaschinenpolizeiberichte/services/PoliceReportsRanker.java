@@ -2,13 +2,16 @@ package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.services;
 
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.FrontEndRequest;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.PoliceReportTransformed;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.RankedPoliceReport;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportTransformedRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
@@ -20,11 +23,19 @@ public class PoliceReportsRanker {
     @Autowired
     private TextTransformerService textService;
 
-    public List<String> getTop10PoliceReports(FrontEndRequest frontEndRequest) {
+    @Autowired
+    private FullTextSearchService fullTextSearchService;
+
+    public List<RankedPoliceReport> getTop10PoliceReports(FrontEndRequest frontEndRequest) {
         List<String> searchStrings = textService.transform(frontEndRequest.getSearchString());
         List<PoliceReportTransformed> allReports = getAllReports();
         Stream<PoliceReportTransformed> filteredReports = filterReports(allReports, frontEndRequest);
-        return null;
+
+        return filteredReports
+                .map(report -> fullTextSearchService.run(report, searchStrings))
+                .sorted(Comparator.comparing(RankedPoliceReport::getScore, Integer::compareTo))
+                .limit(10)
+                .collect(Collectors.toList());
     }
 
     private List<PoliceReportTransformed> getAllReports() {
