@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 public class FullTextSearchService {
 
     public RankedPoliceReport run(PoliceReportTransformed report, List<String> searchStrings) {
-        Stream<String> corpus = Stream.concat(report.getContent().stream(), report.getTitle().stream());
+      Stream<String> corpus = Stream.concat(report.getContent().stream(), report.getTitle().stream()).distinct();
         int score = (int) searchStrings.stream().filter(str -> corpus.anyMatch(s -> s.equals(str))).count();
         return new RankedPoliceReport(report.getIdToOrigin(), score);
     }
