@@ -7,7 +7,7 @@ import lombok.*;
 @Setter
 @Getter
 @Builder
-public class RankedPoliceReport {
-    private String idToOrigin;
-    private int score;
+public class ComputeSearchResponse {
+    String searchId;
+    int count;
 }
