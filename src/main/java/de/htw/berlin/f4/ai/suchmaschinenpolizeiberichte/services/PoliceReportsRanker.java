@@ -33,7 +33,7 @@ public class PoliceReportsRanker {
 
         return filteredReports
                 .map(report -> fullTextSearchService.run(report, searchStrings))
-                .sorted(Comparator.comparing(RankedPoliceReport::getScore, Integer::compareTo))
+                .sorted(Comparator.comparing(RankedPoliceReport::getScore, Integer::compareTo).reversed())
                 .limit(10)
                 .collect(Collectors.toList());
     }
