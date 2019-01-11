@@ -1,4 +1,4 @@
-package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model;
+package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.lemmatizer;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -15,6 +15,7 @@ import java.util.List;
 public class Lemmatizer {
     @Id
     private String id;
+
     private String word;
     private String lemmatizedWord;
     private List<String> synonyms;

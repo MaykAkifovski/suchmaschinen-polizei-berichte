@@ -1,7 +1,7 @@
-package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.services;
+package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.semanticSearch;
 
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.PoliceReportTransformed;
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.RankedPoliceReport;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.PoliceReportTransformed;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.RankedPoliceReport;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @Component
-public class FullTextSearchService {
+public class FullTextSearch {
 
     public RankedPoliceReport run(PoliceReportTransformed report, List<String> searchStrings) {
         Supplier<Stream<String>> corpus = () -> Stream.concat(report.getContent().stream(), report.getTitle().stream());

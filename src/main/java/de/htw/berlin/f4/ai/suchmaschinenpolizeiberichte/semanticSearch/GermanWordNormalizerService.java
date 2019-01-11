@@ -1,6 +1,7 @@
-package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.services;
+package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.semanticSearch;
 
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.ApiResponse;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.lemmatizer.Lemmatizer;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.lemmatizer.LemmatizerApiResponse;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.LemmatizerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -33,20 +34,27 @@ public class GermanWordNormalizerService {
     @Cacheable("normalizerCache")
     public String lemmatize(String word) {
         word = word.replaceAll("([,.!?]$)", "");
-        return lemmatizer.getOrDefault(word, normalize(getWordFromApi(word)));
+        return lemmatizer.getOrDefault(word, findWord(word));
+    }
+
+    private String findWord(String word) {
+        String lemmatizedWord = normalize(getWordFromApi(word));
+        lemmatizer.put(word, lemmatizedWord);
+        lemmatizerRepository.save(Lemmatizer.builder().word(word).lemmatizedWord(lemmatizedWord).build());
+        return lemmatizedWord;
     }
 
     private String getWordFromApi(String word) {
         try {
-            ResponseEntity<List<ApiResponse>> responseEntity = new RestTemplate()
+            ResponseEntity<List<LemmatizerApiResponse>> responseEntity = new RestTemplate()
                     .exchange(
                             URI + word,
                             HttpMethod.GET,
                             null,
-                            new ParameterizedTypeReference<List<ApiResponse>>() {
+                            new ParameterizedTypeReference<List<LemmatizerApiResponse>>() {
                             }
                     );
-            List<ApiResponse> responseBody = responseEntity.getBody();
+            List<LemmatizerApiResponse> responseBody = responseEntity.getBody();
             return responseBody == null || responseBody.isEmpty() || responseBody.get(0).getRelation().equals("is_baseform")
                     ? word : responseBody.get(0).getWord2();
         } catch (Exception ignored) {

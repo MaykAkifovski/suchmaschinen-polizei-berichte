@@ -1,4 +1,4 @@
-package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model;
+package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.lemmatizer;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @Setter
 @Getter
 @Builder
-public class ApiResponse {
+public class LemmatizerApiResponse {
 
     private String word2;
     private String relation;

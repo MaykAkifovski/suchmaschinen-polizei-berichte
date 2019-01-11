@@ -1,8 +1,8 @@
-package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.services;
+package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.semanticSearch;
 
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.FrontEndRequest;
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.PoliceReportTransformed;
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.RankedPoliceReport;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.PoliceReportTransformed;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.RankedPoliceReport;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.request.FrontEndRequest;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportTransformedRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,20 +21,20 @@ public class PoliceReportsRanker {
     private PoliceReportTransformedRepository repository;
 
     @Autowired
-    private TextTransformerService textService;
+    private TextTokenizer textService;
 
     @Autowired
-    private FullTextSearchService fullTextSearchService;
+    private FullTextSearch fullTextSearch;
 
-    public List<RankedPoliceReport> getTop10PoliceReports(FrontEndRequest frontEndRequest) {
+    public List<RankedPoliceReport> getPoliceReportsSortedByScore(FrontEndRequest frontEndRequest) {
         List<String> searchStrings = textService.transform(frontEndRequest.getSearchString());
         List<PoliceReportTransformed> allReports = getAllReports();
         Stream<PoliceReportTransformed> filteredReports = filterReports(allReports, frontEndRequest);
 
         return filteredReports
-                .map(report -> fullTextSearchService.run(report, searchStrings))
+                .map(report -> fullTextSearch.run(report, searchStrings))
+                .filter(o -> o.getScore() != 0)
                 .sorted(Comparator.comparing(RankedPoliceReport::getScore, Integer::compareTo).reversed())
-                .limit(10)
                 .collect(Collectors.toList());
     }
 

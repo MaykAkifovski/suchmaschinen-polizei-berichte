@@ -1,4 +1,4 @@
-package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.services;
+package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.semanticSearch;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import static org.springframework.util.StringUtils.isEmpty;
 
 @Component
-public class TextTransformerService {
+public class TextTokenizer {
 
     @Autowired
     private GermanWordNormalizerService normalizerService;

@@ -1,8 +1,8 @@
 package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.synonym;
 
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.Lemmatizer;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.lemmatizer.Lemmatizer;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.LemmatizerRepository;
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.services.GermanWordNormalizerService;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.semanticSearch.GermanWordNormalizerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

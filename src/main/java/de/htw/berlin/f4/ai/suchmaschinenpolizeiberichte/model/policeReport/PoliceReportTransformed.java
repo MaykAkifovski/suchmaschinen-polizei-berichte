@@ -1,4 +1,4 @@
-package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model;
+package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -13,6 +13,7 @@ import java.util.List;
 @Setter
 @Getter
 @Builder
+@ToString
 public class PoliceReportTransformed {
     @Id
     private String id;
@@ -21,16 +22,4 @@ public class PoliceReportTransformed {
     private long date;
     private List<String> title;
     private List<String> content;
-
-    @Override
-    public String toString() {
-        return "PoliceReportTransformed{" +
-                "id='" + id + '\'' +
-                ", idToOrigin='" + idToOrigin + '\'' +
-                ", location=" + location +
-                ", date=" + date +
-                ", title=" + title +
-                ", content=" + content +
-                '}';
-    }
 }

@@ -1,5 +1,6 @@
-package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model;
+package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response;
 
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.RankedPoliceReport;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -21,6 +22,5 @@ public class RequestObjectLog {
     public List<String> searchedLocation;
     public List<String> searchedDatum;
     public List<RankedPoliceReport> results;
-
 
 }

@@ -1,4 +1,4 @@
-package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model;
+package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport;
 
 import lombok.*;
 

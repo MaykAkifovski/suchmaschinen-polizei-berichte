@@ -1,9 +1,9 @@
 package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.controllers;
 
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.ComputeSearchResponse;
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.FrontEndRequest;
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.RankedPoliceReport;
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.services.SearchService;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.RankedPoliceReport;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.request.FrontEndRequest;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response.ComputeSearchResponse;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.semanticSearch.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
