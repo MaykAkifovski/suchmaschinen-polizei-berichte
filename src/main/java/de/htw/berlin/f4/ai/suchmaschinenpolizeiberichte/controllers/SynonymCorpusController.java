@@ -2,12 +2,12 @@ package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.controllers;
 
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.synonym.SynonymService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
-@Controller
+@RestController
 @RequestMapping("/synonyms")
 public class SynonymCorpusController {
 

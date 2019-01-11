@@ -23,7 +23,7 @@ public class SwaggerConfiguration {
   public Docket technischeDokumentation() {
     return new Docket(SWAGGER_2)
         .select()
-        .apis(RequestHandlerSelectors.basePackage("de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte"))
+            .apis(RequestHandlerSelectors.basePackage("de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.controllers"))
         .paths(PathSelectors.any())
         .build()
         .pathMapping("/")
