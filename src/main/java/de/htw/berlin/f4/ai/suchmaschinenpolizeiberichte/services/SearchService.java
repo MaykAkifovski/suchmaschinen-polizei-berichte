@@ -30,9 +30,9 @@ public class SearchService {
     private FullTextSearchService fullTextSearchService;
 
 
-    public List<RankedPoliceReport> getSearch(String searchId, int page, int pagesize){
+    public List<RankedPoliceReport> getSearch(String searchId, int page, int pagesize) {
         RequestObjectLog requestObjectLog = requestObjectLogRepository.findById(searchId).get();
-        return requestObjectLog.getResults().subList((page-1)*pagesize, (page-1)*pagesize + pagesize);
+        return requestObjectLog.getResults().subList((page - 1) * pagesize, (page - 1) * pagesize + pagesize);
     }
 
     public ComputeSearchResponse computeSearch(FrontEndRequest frontEndRequest) {
@@ -47,15 +47,14 @@ public class SearchService {
         requestObjectLog.setSearchedLocation(frontEndRequest.getSearchLocations());
         requestObjectLog.setSearchedText(frontEndRequest.getSearchString());
 
-        List<RankedPoliceReport> results =  filteredReports
+        List<RankedPoliceReport> results = filteredReports
                 .map(report -> fullTextSearchService.run(report, searchStrings))
-                .sorted(Comparator.comparing(RankedPoliceReport::getScore, Integer::compareTo))
+                .sorted(Comparator.comparing(RankedPoliceReport::getScore, Integer::compareTo).reversed())
                 .collect(Collectors.toList());
 
         requestObjectLog.setResults(results);
 
         requestObjectLogRepository.save(requestObjectLog);
-//ID wird automatisch gezahlt? überprüfen ob requestObjectLog.getId() das richtige zurückgibt
         return new ComputeSearchResponse(requestObjectLog.getId(), results.size());
     }
 
