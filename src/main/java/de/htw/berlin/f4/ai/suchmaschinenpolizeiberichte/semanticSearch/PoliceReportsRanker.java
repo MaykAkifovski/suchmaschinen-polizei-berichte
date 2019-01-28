@@ -7,8 +7,10 @@ import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportT
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +18,13 @@ import java.util.stream.Stream;
 
 @Component
 public class PoliceReportsRanker {
+
+    private List<PoliceReportTransformed> allReports = new ArrayList<>();
+
+    @PostConstruct
+    public void init() {
+        allReports = repository.findAll();
+    }
 
     @Autowired
     private PoliceReportTransformedRepository repository;
@@ -28,7 +37,6 @@ public class PoliceReportsRanker {
 
     public List<RankedPoliceReport> getPoliceReportsSortedByScore(FrontEndRequest frontEndRequest) {
         List<String> searchStrings = textService.transform(frontEndRequest.getSearchString());
-        List<PoliceReportTransformed> allReports = getAllReports();
         Stream<PoliceReportTransformed> filteredReports = filterReports(allReports, frontEndRequest);
 
         return filteredReports
@@ -36,10 +44,6 @@ public class PoliceReportsRanker {
                 .filter(o -> o.getScore() != 0)
                 .sorted(Comparator.comparing(RankedPoliceReport::getScore, Integer::compareTo).reversed())
                 .collect(Collectors.toList());
-    }
-
-    private List<PoliceReportTransformed> getAllReports() {
-        return repository.findAll();
     }
 
     private Stream<PoliceReportTransformed> filterReports(List<PoliceReportTransformed> allReports, FrontEndRequest frontEndRequest) {
