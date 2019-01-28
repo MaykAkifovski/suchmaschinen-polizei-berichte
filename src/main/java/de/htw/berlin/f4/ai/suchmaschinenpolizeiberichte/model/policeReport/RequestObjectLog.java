@@ -1,4 +1,4 @@
-package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response;
+package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport;
 
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.RankedPoliceReport;
 import lombok.*;

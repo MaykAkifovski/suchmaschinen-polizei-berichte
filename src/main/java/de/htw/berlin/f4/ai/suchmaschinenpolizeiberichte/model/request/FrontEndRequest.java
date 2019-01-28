@@ -11,6 +11,6 @@ import java.util.List;
 @Builder
 public class FrontEndRequest {
     private String searchString;
-    private List<String> searchDaterange;
+    private List<String> searchDateRange;
     private List<String> searchLocations;
 }

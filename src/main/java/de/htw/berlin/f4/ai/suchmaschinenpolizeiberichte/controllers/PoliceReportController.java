@@ -1,17 +1,16 @@
 package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.controllers;
 
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.PoliceReport;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.RankedPoliceReport;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.request.FrontEndRequest;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response.ComputeSearchResponse;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response.GetSearchResponse;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.semanticSearch.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -34,15 +33,23 @@ public class PoliceReportController {
     }
 
     @RequestMapping(method = GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<RankedPoliceReport> getSearch(@RequestParam("searcId") String searcId,
-                                              @RequestParam("page") int page,
-                                              @RequestParam("pageSize") int pageSize) {
+    public List<GetSearchResponse> getSearch(@RequestParam("searchId") String searchId,
+                                             @RequestParam("page") int page,
+                                             @RequestParam("pageSize") int pageSize) {
         try {
-            return searchService.getSearch(searcId, page, pageSize);
+            return searchService.getSearch(searchId, page, pageSize);
         } catch (NotFoundException ignored) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found");
         }
     }
 
+    @RequestMapping(value="{id}", method = GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public PoliceReport getOnePoliceReport(@PathVariable String id) {
+        try {
+            return searchService.getPoliceReportById(id);
+        } catch (NotFoundException ignored) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Not Found");
+        }
+    }
 
 }

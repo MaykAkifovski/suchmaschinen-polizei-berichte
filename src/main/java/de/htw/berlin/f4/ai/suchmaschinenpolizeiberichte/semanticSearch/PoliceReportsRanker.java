@@ -48,8 +48,8 @@ public class PoliceReportsRanker {
 
     private Stream<PoliceReportTransformed> filterReports(List<PoliceReportTransformed> allReports, FrontEndRequest frontEndRequest) {
         try {
-            long startDate = parseDate(frontEndRequest.getSearchDaterange().get(0));
-            long endDate = parseDate(frontEndRequest.getSearchDaterange().get(1));
+            long startDate = parseDate(frontEndRequest.getSearchDateRange().get(0));
+            long endDate = parseDate(frontEndRequest.getSearchDateRange().get(1));
 
             return filterByLocation(allReports, frontEndRequest.getSearchLocations())
                     .filter(policeReportTransformed -> filterByDate(policeReportTransformed.getDate(), startDate, endDate));
