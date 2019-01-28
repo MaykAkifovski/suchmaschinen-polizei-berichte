@@ -22,4 +22,5 @@ public class PoliceReportTransformed {
     private long date;
     private List<String> title;
     private List<String> content;
+    private List<String> synonymsForContent;
 }
