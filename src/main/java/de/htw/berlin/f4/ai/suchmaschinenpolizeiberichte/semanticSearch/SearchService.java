@@ -9,7 +9,7 @@ import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response.ComputeSe
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response.GetSearchResponse;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportLoader;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportTransformedLoader;
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.RequestObjectLogRepository;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.RequestObjectLogLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Component;
@@ -22,7 +22,7 @@ import java.util.List;
 public class SearchService {
 
     @Autowired
-    private RequestObjectLogRepository requestObjectLogRepository;
+    private RequestObjectLogLoader requestObjectLogLoader;
 
     @Autowired
     private PoliceReportLoader policeReportLoader;
@@ -45,7 +45,7 @@ public class SearchService {
     }
 
     public List<RankedPoliceReport> getFilteredRankedPoliceReport(String searchId, int page, int pagesize) throws NotFoundException {
-        return requestObjectLogRepository
+        return requestObjectLogLoader
                 .findById(searchId)
                 .orElseThrow(NotFoundException::new)
                 .getResults()
@@ -80,7 +80,7 @@ public class SearchService {
     public ComputeSearchResponse computeSearch(FrontEndRequest frontEndRequest) {
         List<RankedPoliceReport> rankedPoliceReports = policeReportsRanker.getPoliceReportsSortedByScore(frontEndRequest);
         RequestObjectLog requestObjectLog = createRequestObjectLog(frontEndRequest, rankedPoliceReports);
-        requestObjectLogRepository.save(requestObjectLog);
+        requestObjectLogLoader.add(requestObjectLog);
         return createSearchResponse(requestObjectLog.getId(), rankedPoliceReports.size());
     }
 
