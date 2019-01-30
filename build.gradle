@@ -31,7 +31,6 @@ dependencies {
     compile group: 'org.springframework', name: 'spring-web', version: '5.1.2.RELEASE'
 
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb', version: springBootVersion
 
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
     compile group: 'org.projectlombok', name: 'lombok', version: '1.18.4'

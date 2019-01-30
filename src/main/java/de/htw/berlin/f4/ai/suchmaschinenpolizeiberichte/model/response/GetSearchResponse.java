@@ -1,9 +1,6 @@
 package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response;
 
 import lombok.*;
-import org.springframework.data.annotation.Id;
-
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor

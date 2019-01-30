@@ -1,5 +1,6 @@
 package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.semanticSearch;
 
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.exception.NotFoundException;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.PoliceReport;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.PoliceReportTransformed;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.RankedPoliceReport;
@@ -11,32 +12,27 @@ import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportL
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportTransformedLoader;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.RequestObjectLogLoader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Component
 public class SearchService {
 
     @Autowired
     private RequestObjectLogLoader requestObjectLogLoader;
-
     @Autowired
     private PoliceReportLoader policeReportLoader;
-
     @Autowired
     private PoliceReportTransformedLoader policeReportTransformedLoader;
-
     @Autowired
     private PoliceReportsRanker policeReportsRanker;
 
-
     public List<GetSearchResponse> getSearch(String searchId, int page, int pagesize) throws NotFoundException {
         List<RankedPoliceReport> rankedPoliceReports = getFilteredRankedPoliceReport(searchId, page, pagesize);
-
         return buildSearchResponse(rankedPoliceReports);
     }
 
@@ -44,15 +40,20 @@ public class SearchService {
         return policeReportLoader.findById(searchId).orElseThrow(NotFoundException::new);
     }
 
-    public List<RankedPoliceReport> getFilteredRankedPoliceReport(String searchId, int page, int pagesize) throws NotFoundException {
-        return requestObjectLogLoader
+    private List<RankedPoliceReport> getFilteredRankedPoliceReport(String searchId, int page, int pagesize) throws NotFoundException {
+        List<RankedPoliceReport> result = requestObjectLogLoader
                 .findById(searchId)
                 .orElseThrow(NotFoundException::new)
-                .getResults()
-                .subList((page - 1) * pagesize, (page - 1) * pagesize + pagesize);
+                .getResults();
+        if (result.size() > pagesize) {
+            return result
+                    .subList((page - 1) * pagesize, (page - 1) * pagesize + pagesize);
+        } else {
+            return result;
+        }
     }
 
-    public List<GetSearchResponse> buildSearchResponse(List<RankedPoliceReport> rankedPoliceReports) throws NotFoundException {
+    private List<GetSearchResponse> buildSearchResponse(List<RankedPoliceReport> rankedPoliceReports) throws NotFoundException {
 
         List<GetSearchResponse> results = new ArrayList<>();
 
@@ -86,12 +87,17 @@ public class SearchService {
 
     private RequestObjectLog createRequestObjectLog(FrontEndRequest frontEndRequest, List<RankedPoliceReport> rankedPoliceReports) {
         return RequestObjectLog.builder()
+                .id(generateId())
                 .date(LocalDate.now().toString())
                 .searchedDatum(frontEndRequest.getSearchDateRange())
                 .searchedLocation(frontEndRequest.getSearchLocations())
                 .searchedText(frontEndRequest.getSearchString())
                 .results(rankedPoliceReports)
                 .build();
+    }
+
+    private String generateId() {
+        return String.valueOf(Math.abs(new Random().nextLong()));
     }
 
     private ComputeSearchResponse createSearchResponse(String id, int count) {

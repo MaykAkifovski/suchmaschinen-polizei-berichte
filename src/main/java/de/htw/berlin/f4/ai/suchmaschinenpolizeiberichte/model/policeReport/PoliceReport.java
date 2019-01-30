@@ -1,9 +1,7 @@
 package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport;
 
 import lombok.*;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "PoliceReports")
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
