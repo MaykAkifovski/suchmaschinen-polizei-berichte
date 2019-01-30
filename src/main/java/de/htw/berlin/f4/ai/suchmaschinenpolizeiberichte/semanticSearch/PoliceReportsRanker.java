@@ -7,7 +7,6 @@ import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportT
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,11 +20,6 @@ public class PoliceReportsRanker {
 
     private List<PoliceReportTransformed> allReports = new ArrayList<>();
 
-    @PostConstruct
-    public void init() {
-        allReports = repository.findAll();
-    }
-
     @Autowired
     private PoliceReportTransformedRepository repository;
 
@@ -37,6 +31,9 @@ public class PoliceReportsRanker {
 
     public List<RankedPoliceReport> getPoliceReportsSortedByScore(FrontEndRequest frontEndRequest) {
         List<String> searchStrings = textService.transform(frontEndRequest.getSearchString());
+        if (allReports.isEmpty()) {
+            allReports = repository.findAll();
+        }
         Stream<PoliceReportTransformed> filteredReports = filterReports(allReports, frontEndRequest);
 
         return filteredReports
