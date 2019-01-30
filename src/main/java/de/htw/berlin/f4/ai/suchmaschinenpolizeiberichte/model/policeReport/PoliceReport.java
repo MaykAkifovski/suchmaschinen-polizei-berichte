@@ -1,7 +1,6 @@
 package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport;
 
 import lombok.*;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "PoliceReports")
@@ -11,14 +10,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @Builder
 public class PoliceReport {
-    @Id
-    public String id;
-
-    public String header;
-    public Boolean isLocationInHeader;
-    public String title;
-    public String url;
-    public String createdAt;
-    public String content;
-
+    private String _id;
+    private String header;
+    private Boolean isLocationInHeader;
+    private String title;
+    private String url;
+    private String createdAt;
+    private String content;
+    private Object _class;
 }

@@ -3,11 +3,11 @@ package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.semanticSearch;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.PoliceReport;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.PoliceReportTransformed;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.RankedPoliceReport;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.RequestObjectLog;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.request.FrontEndRequest;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response.ComputeSearchResponse;
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.RequestObjectLog;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response.GetSearchResponse;
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportRepository;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportLoader;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportTransformedRepository;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.RequestObjectLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class SearchService {
@@ -26,7 +25,7 @@ public class SearchService {
     private RequestObjectLogRepository requestObjectLogRepository;
 
     @Autowired
-    private PoliceReportRepository policeReportRepository;
+    private PoliceReportLoader policeReportLoader;
 
     @Autowired
     private PoliceReportTransformedRepository policeReportTransformedRepository;
@@ -36,16 +35,16 @@ public class SearchService {
 
 
     public List<GetSearchResponse> getSearch(String searchId, int page, int pagesize) throws NotFoundException {
-        List <RankedPoliceReport> rankedPoliceReports = getFilteredRankedPoliceReport(searchId,page,pagesize);
+        List<RankedPoliceReport> rankedPoliceReports = getFilteredRankedPoliceReport(searchId, page, pagesize);
 
         return buildSearchResponse(rankedPoliceReports);
     }
 
     public PoliceReport getPoliceReportById(String searchId) throws NotFoundException {
-        return policeReportRepository.findById(searchId).orElseThrow(NotFoundException::new);
+        return policeReportLoader.findById(searchId).orElseThrow(NotFoundException::new);
     }
 
-    public List<RankedPoliceReport> getFilteredRankedPoliceReport(String searchId, int page, int pagesize) throws NotFoundException{
+    public List<RankedPoliceReport> getFilteredRankedPoliceReport(String searchId, int page, int pagesize) throws NotFoundException {
         return requestObjectLogRepository
                 .findById(searchId)
                 .orElseThrow(NotFoundException::new)
@@ -53,13 +52,13 @@ public class SearchService {
                 .subList((page - 1) * pagesize, (page - 1) * pagesize + pagesize);
     }
 
-    public List<GetSearchResponse> buildSearchResponse(List<RankedPoliceReport> rankedPoliceReports) throws NotFoundException{
+    public List<GetSearchResponse> buildSearchResponse(List<RankedPoliceReport> rankedPoliceReports) throws NotFoundException {
 
         List<GetSearchResponse> results = new ArrayList<>();
 
-        for (RankedPoliceReport rankedPoliceReportBar : rankedPoliceReports){
+        for (RankedPoliceReport rankedPoliceReportBar : rankedPoliceReports) {
 
-            PoliceReport policeReport = policeReportRepository
+            PoliceReport policeReport = policeReportLoader
                     .findById(rankedPoliceReportBar.getIdToOrigin())
                     .orElse(null);
 
@@ -67,9 +66,9 @@ public class SearchService {
                     .findOneByIdToOrigin(rankedPoliceReportBar.getIdToOrigin());
 
             GetSearchResponse searchResponse = GetSearchResponse.builder()
-                    .content(policeReport.getContent().substring(0,100))
+                    .content(policeReport.getContent().substring(0, 100))
                     .date(policeReportTransformed.getDate())
-                    .id(policeReport.getId())
+                    .id(policeReport.get_id())
                     .location(policeReportTransformed.getLocation())
                     .build();
             results.add(searchResponse);
