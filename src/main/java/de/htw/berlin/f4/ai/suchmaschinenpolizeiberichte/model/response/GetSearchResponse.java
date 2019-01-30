@@ -8,8 +8,8 @@ import lombok.*;
 @Getter
 @Builder
 public class GetSearchResponse {
-    public String id;
-    public String location;
-    public long date;
-    public String content;
+    private String id;
+    private String location;
+    private long date;
+    private String content;
 }
