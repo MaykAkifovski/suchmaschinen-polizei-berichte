@@ -8,7 +8,7 @@ import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.request.FrontEndRe
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response.ComputeSearchResponse;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response.GetSearchResponse;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportLoader;
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportTransformedRepository;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportTransformedLoader;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.RequestObjectLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
@@ -28,7 +28,7 @@ public class SearchService {
     private PoliceReportLoader policeReportLoader;
 
     @Autowired
-    private PoliceReportTransformedRepository policeReportTransformedRepository;
+    private PoliceReportTransformedLoader policeReportTransformedLoader;
 
     @Autowired
     private PoliceReportsRanker policeReportsRanker;
@@ -62,8 +62,9 @@ public class SearchService {
                     .findById(rankedPoliceReportBar.getIdToOrigin())
                     .orElse(null);
 
-            PoliceReportTransformed policeReportTransformed = policeReportTransformedRepository
-                    .findOneByIdToOrigin(rankedPoliceReportBar.getIdToOrigin());
+            PoliceReportTransformed policeReportTransformed = policeReportTransformedLoader
+                    .findOneByIdToOrigin(rankedPoliceReportBar.getIdToOrigin())
+                    .orElseThrow(NotFoundException::new);
 
             GetSearchResponse searchResponse = GetSearchResponse.builder()
                     .content(policeReport.getContent().substring(0, 100))

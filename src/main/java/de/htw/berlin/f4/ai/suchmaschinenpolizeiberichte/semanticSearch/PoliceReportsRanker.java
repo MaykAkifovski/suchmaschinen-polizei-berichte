@@ -3,13 +3,12 @@ package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.semanticSearch;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.PoliceReportTransformed;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.RankedPoliceReport;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.request.FrontEndRequest;
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportTransformedRepository;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportTransformedLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,10 +17,8 @@ import java.util.stream.Stream;
 @Component
 public class PoliceReportsRanker {
 
-    private List<PoliceReportTransformed> allReports = new ArrayList<>();
-
     @Autowired
-    private PoliceReportTransformedRepository repository;
+    private PoliceReportTransformedLoader policeReportTransformedLoader;
 
     @Autowired
     private TextTokenizer textService;
@@ -31,9 +28,7 @@ public class PoliceReportsRanker {
 
     public List<RankedPoliceReport> getPoliceReportsSortedByScore(FrontEndRequest frontEndRequest) {
         List<String> searchStrings = textService.transform(frontEndRequest.getSearchString());
-        if (allReports.isEmpty()) {
-            allReports = repository.findAll();
-        }
+        List<PoliceReportTransformed> allReports = policeReportTransformedLoader.getPoliceReportTransformedList();
         Stream<PoliceReportTransformed> filteredReports = filterReports(allReports, frontEndRequest);
 
         return filteredReports
