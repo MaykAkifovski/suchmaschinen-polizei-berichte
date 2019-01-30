@@ -1,7 +1,6 @@
 package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.lemmatizer;
 
 import lombok.*;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
@@ -13,10 +12,10 @@ import java.util.List;
 @Getter
 @Builder
 public class Lemmatizer {
-    @Id
-    private String id;
 
+    private Object _id;
     private String word;
     private String lemmatizedWord;
     private List<String> synonyms;
+    private Object _class;
 }

@@ -2,7 +2,7 @@ package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.semanticSearch;
 
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.lemmatizer.Lemmatizer;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.lemmatizer.LemmatizerApiResponse;
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.LemmatizerRepository;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.LemmatizerLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
@@ -22,13 +22,13 @@ public class GermanWordNormalizerService {
     private static final String URI = "http://api.corpora.uni-leipzig.de/ws/words/deu_news_2012_1M/wordrelations/";
 
     @Autowired
-    private LemmatizerRepository lemmatizerRepository;
+    private LemmatizerLoader lemmatizerLoader;
 
     private Map<String, String> lemmatizer = new HashMap<>();
 
     @PostConstruct
     public void init() {
-        lemmatizerRepository.findAll().forEach(o -> lemmatizer.put(o.getWord(), o.getLemmatizedWord()));
+        lemmatizerLoader.getLemmatizerList().forEach(o -> lemmatizer.put(o.getWord(), o.getLemmatizedWord()));
     }
 
     @Cacheable("normalizerCache")
@@ -40,7 +40,7 @@ public class GermanWordNormalizerService {
     private String findWord(String word) {
         String lemmatizedWord = normalize(getWordFromApi(word));
         lemmatizer.put(word, lemmatizedWord);
-        lemmatizerRepository.save(Lemmatizer.builder().word(word).lemmatizedWord(lemmatizedWord).build());
+        lemmatizerLoader.add(Lemmatizer.builder().word(word).lemmatizedWord(lemmatizedWord).build());
         return lemmatizedWord;
     }
 
