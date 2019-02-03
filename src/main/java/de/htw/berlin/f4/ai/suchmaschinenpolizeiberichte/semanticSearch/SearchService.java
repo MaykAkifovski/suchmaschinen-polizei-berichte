@@ -7,6 +7,7 @@ import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.Ranke
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.RequestObjectLog;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.request.FrontEndRequest;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response.ComputeSearchResponse;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response.GetDetailedSearchResponse;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response.GetSearchResponse;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportLoader;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.PoliceReportTransformedLoader;
@@ -37,8 +38,15 @@ public class SearchService {
         return buildSearchResponse(rankedPoliceReports);
     }
 
-    public PoliceReport getPoliceReportById(String searchId) throws NotFoundException {
-        return policeReportLoader.findById(searchId).orElseThrow(NotFoundException::new);
+    public GetDetailedSearchResponse getPoliceReportById(String searchId) throws NotFoundException {
+
+        PoliceReport policeReport =  policeReportLoader.findById(searchId).orElseThrow(NotFoundException::new);
+        return GetDetailedSearchResponse.builder()
+                .content(policeReport.getContent())
+                .createdAt(policeReport.getCreatedAt())
+                .header(policeReport.getHeader())
+                .title(policeReport.getTitle())
+                .url(policeReport.getUrl()).build();
     }
 
     private List<RankedPoliceReport> getFilteredRankedPoliceReport(String searchId, int page, int pagesize) throws NotFoundException {

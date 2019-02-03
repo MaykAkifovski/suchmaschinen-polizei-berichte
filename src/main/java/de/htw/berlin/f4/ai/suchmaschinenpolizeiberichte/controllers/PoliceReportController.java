@@ -4,6 +4,7 @@ import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.exception.NotFoundExcept
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.PoliceReport;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.request.FrontEndRequest;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response.ComputeSearchResponse;
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response.GetDetailedSearchResponse;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response.GetSearchResponse;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.semanticSearch.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class PoliceReportController {
     }
 
     @RequestMapping(value="{id}", method = GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public PoliceReport getOnePoliceReport(@PathVariable String id) {
+    public GetDetailedSearchResponse getOnePoliceReport(@PathVariable String id) {
         try {
             return searchService.getPoliceReportById(id);
         } catch (NotFoundException ignored) {
