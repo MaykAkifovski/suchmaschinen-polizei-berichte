@@ -9,7 +9,9 @@ import lombok.*;
 @Builder
 public class GetSearchResponse {
     private String id;
+    private String title;
+    private String url;
     private String location;
     private long date;
-    private String content;
+    private String snippet;
 }

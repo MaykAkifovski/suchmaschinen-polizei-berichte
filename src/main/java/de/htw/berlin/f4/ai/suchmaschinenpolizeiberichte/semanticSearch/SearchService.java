@@ -65,10 +65,12 @@ public class SearchService {
                     .orElseThrow(NotFoundException::new);
 
             GetSearchResponse searchResponse = GetSearchResponse.builder()
-                    .content(policeReport.getContent().substring(0, 100))
+                    .snippet(policeReport.getContent().substring(0, 100))
                     .date(policeReportTransformed.getDate())
                     .id(policeReport.get_id())
                     .location(policeReportTransformed.getLocation())
+                    .title(policeReport.getTitle())
+                    .url(policeReport.getUrl())
                     .build();
             results.add(searchResponse);
         }
