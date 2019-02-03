@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Component
 public class SearchService {
@@ -45,12 +46,8 @@ public class SearchService {
                 .findById(searchId)
                 .orElseThrow(NotFoundException::new)
                 .getResults();
-        if (result.size() > pagesize) {
-            return result
-                    .subList((page - 1) * pagesize, (page - 1) * pagesize + pagesize);
-        } else {
-            return result;
-        }
+
+        return result.stream().skip(page * pagesize).limit(pagesize).collect(Collectors.toCollection(ArrayList::new));
     }
 
     private List<GetSearchResponse> buildSearchResponse(List<RankedPoliceReport> rankedPoliceReports) throws NotFoundException {
