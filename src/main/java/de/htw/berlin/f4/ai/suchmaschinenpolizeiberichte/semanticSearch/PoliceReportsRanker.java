@@ -56,9 +56,13 @@ public class PoliceReportsRanker {
     }
 
     private Stream<PoliceReportTransformed> filterByLocation(List<PoliceReportTransformed> allReports, List<String> locationsInRequest) {
-        return allReports
-                .stream()
-                .filter(policeReportTransformed -> locationsInRequest.contains(policeReportTransformed.getLocation()));
+
+        if (locationsInRequest != null && locationsInRequest.get(0).length() > 0){
+            return allReports
+                    .stream()
+                    .filter(policeReportTransformed -> locationsInRequest.contains(policeReportTransformed.getLocation()));
+        }
+        return allReports.stream();
     }
 
     private boolean filterByDate(long date, long startDate, long endDate) {
