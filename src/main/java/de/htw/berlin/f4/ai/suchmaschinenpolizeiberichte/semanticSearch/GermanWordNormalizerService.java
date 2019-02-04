@@ -64,6 +64,12 @@ public class GermanWordNormalizerService {
     private String normalize(String word) {
         return word
                 .toLowerCase()
-                .replaceAll("ß", "ss");
+                .replaceAll("ß", "ss")
+                .replaceAll("[Ää]", "a")
+                .replaceAll("[Öö]", "o")
+                .replaceAll("[Üü]", "u")
+                .replaceAll("ae", "a")
+                .replaceAll("oe", "o")
+                .replaceAll("ue", "u");
     }
 }

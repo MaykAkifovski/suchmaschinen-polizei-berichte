@@ -14,7 +14,7 @@ public class SuggestionWordsLoader {
     private Trie trie = new Trie();
 
     @PostConstruct
-    public void init() throws IOException {
+    public void init()  {
         try
         {
             FileInputStream fis = new FileInputStream("suggestionWords2.ser");
@@ -38,6 +38,7 @@ public class SuggestionWordsLoader {
             trie.insert(x.getKey(),x.getValue());
       });
         System.out.println("Trie loaded..");
+        suggestionWords = null;
     }
 
 

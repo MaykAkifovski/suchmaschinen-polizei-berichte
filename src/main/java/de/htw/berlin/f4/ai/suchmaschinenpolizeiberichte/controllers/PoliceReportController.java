@@ -1,7 +1,6 @@
 package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.controllers;
 
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.exception.NotFoundException;
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.PoliceReport;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.request.FrontEndRequest;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response.ComputeSearchResponse;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.response.GetDetailedSearchResponse;
