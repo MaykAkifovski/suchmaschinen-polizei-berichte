@@ -20,7 +20,6 @@ import java.util.Map;
 public class GermanWordNormalizerService {
 
     private static final String URI = "http://api.corpora.uni-leipzig.de/ws/words/deu_news_2012_1M/wordrelations/";
-
     @Autowired
     private LemmatizerLoader lemmatizerLoader;
 
@@ -65,12 +64,6 @@ public class GermanWordNormalizerService {
     private String normalize(String word) {
         return word
                 .toLowerCase()
-                .replaceAll("ß", "ss")
-                .replaceAll("[Ää]", "a")
-                .replaceAll("[Öö]", "o")
-                .replaceAll("[Üü]", "u")
-                .replaceAll("ae", "a")
-                .replaceAll("oe", "o")
-                .replaceAll("ue", "u");
+                .replaceAll("ß", "ss");
     }
 }
