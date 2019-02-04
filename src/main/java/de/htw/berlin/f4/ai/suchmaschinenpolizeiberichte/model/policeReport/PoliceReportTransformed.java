@@ -3,6 +3,7 @@ package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport;
 import lombok.*;
 
 import java.util.List;
+import java.util.Map;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,4 +20,5 @@ public class PoliceReportTransformed {
     private List<String> content;
     private List<String> synonymsForContent;
     private String _class;
+    private Map<String, Double> tf_idf;
 }

@@ -2,7 +2,7 @@ package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.PoliceReportTransformed;
-import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.model.policeReport.TfIdfPoliceReport;
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -19,13 +19,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
+@Getter
 public class PoliceReportTransformedLoader {
     private List<PoliceReportTransformed> policeReportTransformedList = new ArrayList<>();
 
     private Supplier<Stream<String>> wholeCorpus;
     private Supplier<Stream<String>> uniqueCorpus;
     private Map<String, Double> idf;
-    private Supplier<Stream<TfIdfPoliceReport>> tfIdfPoliceReportsList;
 
     @PostConstruct
     public void init() throws IOException {
@@ -41,7 +41,7 @@ public class PoliceReportTransformedLoader {
         wholeCorpus = () -> extractWholeCorpus(policeReportTransformedList);
         uniqueCorpus = () -> wholeCorpus.get().distinct();
         idf = computeIdf(policeReportTransformedList.size());
-        tfIdfPoliceReportsList = () -> computeTfIdfPoliceReports(policeReportTransformedList);
+        policeReportTransformedList = computeTfIdfPoliceReports(policeReportTransformedList);
     }
 
     private Stream<String> extractWholeCorpus(List<PoliceReportTransformed> policeReportTransformedList) {
@@ -65,18 +65,16 @@ public class PoliceReportTransformedLoader {
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> (1. * size) / e.getValue()));
     }
 
-    private Stream<TfIdfPoliceReport> computeTfIdfPoliceReports(List<PoliceReportTransformed> policeReportTransformedList) {
+    private List<PoliceReportTransformed> computeTfIdfPoliceReports(List<PoliceReportTransformed> policeReportTransformedList) {
         return policeReportTransformedList
                 .stream()
-                .map(this::createTfIdfPoliceReport);
+                .map(this::createTfIdfPoliceReport)
+                .collect(Collectors.toList());
     }
 
-    private TfIdfPoliceReport createTfIdfPoliceReport(PoliceReportTransformed policeReportTransformed) {
-        return TfIdfPoliceReport
-                .builder()
-                .idToPoliceReportTransformed(policeReportTransformed.get_id())
-                .tf_idf(createTfIdf(policeReportTransformed))
-                .build();
+    private PoliceReportTransformed createTfIdfPoliceReport(PoliceReportTransformed policeReportTransformed) {
+        policeReportTransformed.setTf_idf(createTfIdf(policeReportTransformed));
+        return policeReportTransformed;
     }
 
     private Map<String, Double> createTfIdf(PoliceReportTransformed policeReport) {
@@ -85,10 +83,6 @@ public class PoliceReportTransformedLoader {
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue() * idf.get(e.getKey())));
-    }
-
-    public List<PoliceReportTransformed> getPoliceReportTransformedList() {
-        return policeReportTransformedList;
     }
 
     public Optional<PoliceReportTransformed> findOneByIdToOrigin(String idToOrigin) {
