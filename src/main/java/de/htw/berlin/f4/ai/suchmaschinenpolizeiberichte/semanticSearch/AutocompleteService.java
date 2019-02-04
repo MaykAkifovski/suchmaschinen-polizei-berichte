@@ -15,19 +15,17 @@ public class AutocompleteService {
 
 
     public List<String> getSuggestions(String sb, int n) {
+
         return getTopNFSortedsuggestions(sb.toLowerCase(), n);
     }
 
     private List<String> getTopNFSortedsuggestions(String sb, int n){
         try{
             Map<String,Integer> predictedWords =  suggestionWordsLoader.getTrie().getSuggestions(sb);
-            Map<String,Integer> sorted = predictedWords.entrySet().stream()
+            return predictedWords.entrySet().stream()
                     .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                    .limit(n)
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey, Map.Entry::getValue));
-
-            return new ArrayList(sorted.keySet());
+                    .limit(n).map(x->x.getKey())
+                    .collect(Collectors.toList());
         } catch(Exception e){
             return Collections.emptyList();
         }
