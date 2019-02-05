@@ -17,9 +17,7 @@ public class SuggestionWordsLoader {
     public void init()  {
         try
         {
-            ClassLoader classLoader = getClass().getClassLoader();
-            File file = new File(classLoader.getResource("suggestionWords2.ser").getFile());
-            FileInputStream fis = new FileInputStream(file);
+            InputStream fis = getClass().getClassLoader().getResourceAsStream("suggestionWords2.ser");
             ObjectInputStream ois = new ObjectInputStream(fis);
             suggestionWords = (HashMap) ois.readObject();
             ois.close();
