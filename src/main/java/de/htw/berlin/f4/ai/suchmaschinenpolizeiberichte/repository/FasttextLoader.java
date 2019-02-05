@@ -21,14 +21,11 @@ import java.util.stream.IntStream;
 @Getter
 public class FasttextLoader {
 
-    private Map<String, Double[]> fasttextModel;
     private Map<String, Double[]> fasttextModelRaw;
 
     @PostConstruct
     public void init() throws IOException {
         fasttextModelRaw = readFromFile("/model.json");
-//        fasttextModel = readFromFile("/fasttextModel.json");
-//        fasttextModel.remove("");
     }
 
     private Map<String, Double[]> readFromFile(String fileName) throws IOException {
