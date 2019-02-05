@@ -2,6 +2,7 @@ package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.controllers;
 
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.FasttextLoader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +13,7 @@ import java.util.Map;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/fastTextController")
 public class FasttextController {
 

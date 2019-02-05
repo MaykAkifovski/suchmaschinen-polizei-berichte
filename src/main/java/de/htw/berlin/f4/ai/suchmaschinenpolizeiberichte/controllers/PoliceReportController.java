@@ -18,6 +18,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/policeReports")
 public class PoliceReportController {
 
@@ -42,7 +43,7 @@ public class PoliceReportController {
         }
     }
 
-    @RequestMapping(value="{id}", method = GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "{id}", method = GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public GetDetailedSearchResponse getOnePoliceReport(@PathVariable String id) {
         try {
             return searchService.getPoliceReportById(id);
