@@ -9,5 +9,5 @@ import lombok.*;
 @Builder
 public class RankedPoliceReport {
     private String idToOrigin;
-    private int score;
+    private double score;
 }

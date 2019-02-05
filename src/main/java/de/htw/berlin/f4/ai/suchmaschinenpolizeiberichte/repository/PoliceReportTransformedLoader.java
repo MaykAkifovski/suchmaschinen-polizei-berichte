@@ -26,6 +26,7 @@ public class PoliceReportTransformedLoader {
     private Supplier<Stream<String>> wholeCorpus;
     private Supplier<Stream<String>> uniqueCorpus;
     private Map<String, Double> idf;
+    private Map<String, Double> tfIdf;
 
     @PostConstruct
     public void init() throws IOException {
@@ -42,6 +43,7 @@ public class PoliceReportTransformedLoader {
         uniqueCorpus = () -> wholeCorpus.get().distinct();
         idf = computeIdf(policeReportTransformedList.size());
         policeReportTransformedList = computeTfIdfPoliceReports(policeReportTransformedList);
+        tfIdf = computeTfIdf();
     }
 
     private Stream<String> extractWholeCorpus(List<PoliceReportTransformed> policeReportTransformedList) {
@@ -83,6 +85,16 @@ public class PoliceReportTransformedLoader {
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue() * idf.get(e.getKey())));
+    }
+
+    private Map<String, Double> computeTfIdf() {
+        return wholeCorpus
+                .get()
+                .collect(Collectors.groupingBy(word -> word, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue() * idf.get(e.getKey())));
+
     }
 
     public Optional<PoliceReportTransformed> findOneByIdToOrigin(String idToOrigin) {

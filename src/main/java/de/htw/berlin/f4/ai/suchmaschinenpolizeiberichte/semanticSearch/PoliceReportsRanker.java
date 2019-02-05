@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,23 +20,33 @@ public class PoliceReportsRanker {
 
     @Autowired
     private PoliceReportTransformedLoader policeReportTransformedLoader;
-
     @Autowired
     private TextTokenizer textService;
-
     @Autowired
-    private FullTextSearch fullTextSearch;
+    private PoliceReportTransformedLoader loader;
+    @Autowired
+    private CosinusSearch cosinusSearch;
 
     public List<RankedPoliceReport> getPoliceReportsSortedByScore(FrontEndRequest frontEndRequest) {
         List<String> searchStrings = textService.transform(frontEndRequest.getSearchString());
+        Map<String, Double> searchVector = createSearchVector(searchStrings);
         List<PoliceReportTransformed> allReports = policeReportTransformedLoader.getPoliceReportTransformedList();
         Stream<PoliceReportTransformed> filteredReports = filterReports(allReports, frontEndRequest);
 
         return filteredReports
-                .map(report -> fullTextSearch.run(report, searchStrings))
+                .map(report -> cosinusSearch.run(report, searchVector))
                 .filter(o -> o.getScore() != 0)
-                .sorted(Comparator.comparing(RankedPoliceReport::getScore, Integer::compareTo).reversed())
+                .sorted(Comparator.comparing(RankedPoliceReport::getScore, Double::compareTo).reversed())
                 .collect(Collectors.toList());
+    }
+
+    private Map<String, Double> createSearchVector(List<String> searchStrings) {
+        return loader
+                .getTfIdf()
+                .entrySet()
+                .stream()
+                .filter(e -> searchStrings.contains(e.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private Stream<PoliceReportTransformed> filterReports(List<PoliceReportTransformed> allReports, FrontEndRequest frontEndRequest) {
@@ -57,7 +68,7 @@ public class PoliceReportsRanker {
 
     private Stream<PoliceReportTransformed> filterByLocation(List<PoliceReportTransformed> allReports, List<String> locationsInRequest) {
 
-        if (locationsInRequest != null && locationsInRequest.get(0).length() > 0){
+        if (locationsInRequest != null && locationsInRequest.get(0).length() > 0) {
             return allReports
                     .stream()
                     .filter(policeReportTransformed -> locationsInRequest.contains(policeReportTransformed.getLocation()));

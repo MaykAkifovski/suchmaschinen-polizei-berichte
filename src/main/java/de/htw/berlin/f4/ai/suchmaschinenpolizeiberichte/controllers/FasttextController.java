@@ -12,7 +12,7 @@ import java.util.Map;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
-@RequestMapping("/dbTaskController")
+@RequestMapping("/fastTextController")
 public class FasttextController {
 
     @Autowired

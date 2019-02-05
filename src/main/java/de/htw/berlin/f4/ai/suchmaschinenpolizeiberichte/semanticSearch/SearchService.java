@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -35,54 +34,54 @@ public class SearchService {
 
     public List<GetSearchResponse> getSearch(String searchId, int page, int pagesize) throws NotFoundException {
         List<RankedPoliceReport> rankedPoliceReports = getFilteredRankedPoliceReport(searchId, page, pagesize);
-        return buildSearchResponse(rankedPoliceReports);
+        return buildResponse(rankedPoliceReports);
+    }
+
+    private List<RankedPoliceReport> getFilteredRankedPoliceReport(String searchId, int page, int pagesize) throws NotFoundException {
+        return requestObjectLogLoader
+                .findById(searchId)
+                .orElseThrow(NotFoundException::new)
+                .getResults()
+                .stream()
+                .skip(page * pagesize)
+                .limit(pagesize)
+                .collect(Collectors.toList());
+    }
+
+    private List<GetSearchResponse> buildResponse(List<RankedPoliceReport> rankedPoliceReports) {
+        return rankedPoliceReports
+                .stream()
+                .map(this::buildOneResponse)
+                .collect(Collectors.toList());
+    }
+
+    private GetSearchResponse buildOneResponse(RankedPoliceReport rankedPoliceReport) {
+        PoliceReport policeReport = policeReportLoader
+                .findById(rankedPoliceReport.getIdToOrigin())
+                .orElse(new PoliceReport());
+
+        PoliceReportTransformed policeReportTransformed = policeReportTransformedLoader
+                .findOneByIdToOrigin(rankedPoliceReport.getIdToOrigin())
+                .orElse(new PoliceReportTransformed());
+
+        return GetSearchResponse.builder()
+                .snippet(policeReport.getContent().substring(0, 100))
+                .date(policeReportTransformed.getDate())
+                .id(policeReport.get_id())
+                .location(policeReportTransformed.getLocation())
+                .title(policeReport.getTitle())
+                .url(policeReport.getUrl())
+                .build();
     }
 
     public GetDetailedSearchResponse getPoliceReportById(String searchId) throws NotFoundException {
-
-        PoliceReport policeReport =  policeReportLoader.findById(searchId).orElseThrow(NotFoundException::new);
+        PoliceReport policeReport = policeReportLoader.findById(searchId).orElseThrow(NotFoundException::new);
         return GetDetailedSearchResponse.builder()
                 .content(policeReport.getContent())
                 .createdAt(policeReport.getCreatedAt())
                 .header(policeReport.getHeader())
                 .title(policeReport.getTitle())
                 .url(policeReport.getUrl()).build();
-    }
-
-    private List<RankedPoliceReport> getFilteredRankedPoliceReport(String searchId, int page, int pagesize) throws NotFoundException {
-        List<RankedPoliceReport> result = requestObjectLogLoader
-                .findById(searchId)
-                .orElseThrow(NotFoundException::new)
-                .getResults();
-
-        return result.stream().skip(page * pagesize).limit(pagesize).collect(Collectors.toCollection(ArrayList::new));
-    }
-
-    private List<GetSearchResponse> buildSearchResponse(List<RankedPoliceReport> rankedPoliceReports) throws NotFoundException {
-
-        List<GetSearchResponse> results = new ArrayList<>();
-
-        for (RankedPoliceReport rankedPoliceReportBar : rankedPoliceReports) {
-
-            PoliceReport policeReport = policeReportLoader
-                    .findById(rankedPoliceReportBar.getIdToOrigin())
-                    .orElse(null);
-
-            PoliceReportTransformed policeReportTransformed = policeReportTransformedLoader
-                    .findOneByIdToOrigin(rankedPoliceReportBar.getIdToOrigin())
-                    .orElseThrow(NotFoundException::new);
-
-            GetSearchResponse searchResponse = GetSearchResponse.builder()
-                    .snippet(policeReport.getContent().substring(0, 100))
-                    .date(policeReportTransformed.getDate())
-                    .id(policeReport.get_id())
-                    .location(policeReportTransformed.getLocation())
-                    .title(policeReport.getTitle())
-                    .url(policeReport.getUrl())
-                    .build();
-            results.add(searchResponse);
-        }
-        return results;
     }
 
     public ComputeSearchResponse computeSearch(FrontEndRequest frontEndRequest) {
