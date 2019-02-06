@@ -26,24 +26,24 @@ public class AutocompleteController {
 
     @RequestMapping(method = GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<String> getSearch(@RequestParam("sb") String subString, @RequestParam("size") int n) {
-        if (!subString.contains(" ")) {
-            return autocompleteService.getSuggestions(subString, n);
-        }
-
         List<String> tokenized = new LinkedList<>(Arrays.asList(subString.split("\\s")));
 
-        if (tokenized.size() < 2) {
+        if (tokenized.size() == 0) {
             return Collections.emptyList();
+        } else if (subString.substring(subString.length() - 1).equals(" ")) {
+            //----->  HIER DEIN CODE   <------
+            return Collections.emptyList();
+        } else if (tokenized.size() == 1) {
+            return autocompleteService.getSuggestions(subString, n);
+        } else {
+            List<String> results = autocompleteService
+                    .getSuggestions(tokenized.get(tokenized.size() - 1), n);
+            tokenized.remove(tokenized.size() - 1);
 
+            return results.stream()
+                    .map(x -> tokenized.stream()
+                            .collect(Collectors.joining(" ")) + " " + x)
+                    .collect(Collectors.toList());
         }
-
-        List<String> results = autocompleteService
-                .getSuggestions(tokenized.get(tokenized.size() - 1), n);
-        tokenized.remove(tokenized.size() - 1);
-        return results.stream()
-                .map(x -> tokenized.stream().collect(Collectors.joining(" ")) + " " + x)
-                .collect(Collectors.toList());
     }
-
-
 }
