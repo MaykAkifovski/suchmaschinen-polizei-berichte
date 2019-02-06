@@ -35,6 +35,9 @@ public class SuggestionWordsLoader {
         lastCleaning("en");
         lastCleaning("nen");
         lastCleaning("n");
+        lastCleaning("es");
+        lastCleaning("s");
+        System.out.println(suggestionWords.size());
 
         suggestionWords.entrySet().forEach(x -> {
             trie.insert(x.getKey(), x.getValue());
