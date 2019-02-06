@@ -14,15 +14,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static java.util.Collections.emptyList;
+
 @Component
 @Getter
 public class FasttextLoader {
 
     private Map<String, Double[]> fasttextModelRaw;
+    private Map<String, String> wordKeys = new HashMap<>();
 
     @PostConstruct
     public void init() throws IOException {
         fasttextModelRaw = readFromFile("/model.json");
+        fasttextModelRaw.forEach((key, value) -> wordKeys.put(key.toLowerCase(), key));
     }
 
     private Map<String, Double[]> readFromFile(String fileName) throws IOException {
@@ -48,23 +52,31 @@ public class FasttextLoader {
         return word.replaceAll("([-,.!?]$)", "");
     }
 
-    public List<Map.Entry<String, Double>> cosinusSimilarity(String word) {
-        if (fasttextModelRaw.containsKey(word)) {
-            Double[] searchVector = fasttextModelRaw.get(word);
-            return fasttextModelRaw
-                    .entrySet()
-                    .stream()
-                    .filter(e -> !e.getKey().equals(word))
-                    .collect(Collectors.toMap(Map.Entry::getKey, e -> calculateCosinusSimilarity(searchVector, e.getValue())))
-                    .entrySet()
-                    .stream()
-                    .filter(e -> e.getValue() > 0.8)
-                    .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
-                    .limit(10)
-                    .collect(Collectors.toList());
+    public List<String> runFasttext(String word) {
+        String _word = wordKeys.getOrDefault(word.toLowerCase(), "");
+        if (_word.equals("")) {
+            return emptyList();
         } else {
-            return Collections.emptyList();
+            return cosinusSimilarity(_word)
+                    .stream()
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
         }
+    }
+
+    public List<Map.Entry<String, Double>> cosinusSimilarity(String word) {
+        Double[] searchVector = fasttextModelRaw.get(word);
+        return fasttextModelRaw
+                .entrySet()
+                .stream()
+                .filter(e -> !e.getKey().equals(word))
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> calculateCosinusSimilarity(searchVector, e.getValue())))
+                .entrySet()
+                .stream()
+                .filter(e -> e.getValue() > 0.8)
+                .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
+                .limit(10)
+                .collect(Collectors.toList());
     }
 
     private Double calculateCosinusSimilarity(Double[] searchVector, Double[] _vector) {

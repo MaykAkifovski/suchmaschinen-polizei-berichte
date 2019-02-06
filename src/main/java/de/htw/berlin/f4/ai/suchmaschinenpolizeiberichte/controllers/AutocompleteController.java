@@ -1,5 +1,6 @@
 package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.controllers;
 
+import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.FasttextLoader;
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.semanticSearch.AutocompleteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -23,27 +24,34 @@ public class AutocompleteController {
 
     @Autowired
     private AutocompleteService autocompleteService;
+    @Autowired
+    private FasttextLoader fasttextLoader;
 
     @RequestMapping(method = GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<String> getSearch(@RequestParam("sb") String subString, @RequestParam("size") int n) {
-        List<String> tokenized = new LinkedList<>(Arrays.asList(subString.split("\\s")));
+        LinkedList<String> tokenized = new LinkedList<>(Arrays.asList(subString.split("\\s")));
 
         if (tokenized.size() == 0) {
             return Collections.emptyList();
-        } else if (subString.substring(subString.length() - 1).equals(" ")) {
-            //----->  HIER DEIN CODE   <------
-            return Collections.emptyList();
+        } else if (subString.endsWith(" ")) {
+            List<String> suggestions = fasttextLoader.runFasttext(tokenized.getLast());
+            return suggestions.isEmpty() ? getSuggestionsForMoreTokens(n, tokenized) : appendSuggestionsForSecondWord(tokenized, suggestions);
         } else if (tokenized.size() == 1) {
             return autocompleteService.getSuggestions(subString, n);
         } else {
-            List<String> results = autocompleteService
-                    .getSuggestions(tokenized.get(tokenized.size() - 1), n);
-            tokenized.remove(tokenized.size() - 1);
-
-            return results.stream()
-                    .map(x -> tokenized.stream()
-                            .collect(Collectors.joining(" ")) + " " + x)
-                    .collect(Collectors.toList());
+            return getSuggestionsForMoreTokens(n, tokenized);
         }
+    }
+
+    private List<String> getSuggestionsForMoreTokens(int n, LinkedList<String> tokenized) {
+        List<String> results = autocompleteService.getSuggestions(tokenized.getLast(), n);
+        return appendSuggestionsForSecondWord(tokenized, results);
+    }
+
+    private List<String> appendSuggestionsForSecondWord(LinkedList<String> tokenized, List<String> results) {
+        tokenized.removeLast();
+        return results.stream()
+                .map(x -> String.join(" ", tokenized) + " " + x)
+                .collect(Collectors.toList());
     }
 }
