@@ -10,10 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -52,18 +49,22 @@ public class FasttextLoader {
     }
 
     public List<Map.Entry<String, Double>> cosinusSimilarity(String word) {
-        Double[] searchVector = fasttextModelRaw.get(word);
-        return fasttextModelRaw
-                .entrySet()
-                .stream()
-                .filter(e -> !e.getKey().equals(word))
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> calculateCosinusSimilarity(searchVector, e.getValue())))
-                .entrySet()
-                .stream()
-                .filter(e -> e.getValue() > 0.8)
-                .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
-                .limit(10)
-                .collect(Collectors.toList());
+        if (fasttextModelRaw.containsKey(word)) {
+            Double[] searchVector = fasttextModelRaw.get(word);
+            return fasttextModelRaw
+                    .entrySet()
+                    .stream()
+                    .filter(e -> !e.getKey().equals(word))
+                    .collect(Collectors.toMap(Map.Entry::getKey, e -> calculateCosinusSimilarity(searchVector, e.getValue())))
+                    .entrySet()
+                    .stream()
+                    .filter(e -> e.getValue() > 0.8)
+                    .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
+                    .limit(10)
+                    .collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     private Double calculateCosinusSimilarity(Double[] searchVector, Double[] _vector) {
