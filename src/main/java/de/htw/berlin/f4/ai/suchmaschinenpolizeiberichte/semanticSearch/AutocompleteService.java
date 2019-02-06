@@ -1,12 +1,15 @@
 package de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.semanticSearch;
 
 import de.htw.berlin.f4.ai.suchmaschinenpolizeiberichte.repository.SuggestionWordsLoader;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.apache.commons.text.similarity.LevenshteinDistance;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -37,8 +40,9 @@ public class AutocompleteService {
         try {
             Map<String, Integer> predictedWords = suggestionWordsLoader.getTrie().getSuggestions(sb);
             return predictedWords.entrySet().stream()
-                    .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                    .limit(n).map(x -> x.getKey())
+                    .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                    .limit(n)
+                    .map(Map.Entry::getKey)
                     .collect(Collectors.toList());
         } catch (Exception e) {
             return Collections.emptyList();
